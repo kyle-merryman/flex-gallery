@@ -26,6 +26,7 @@
     .panels {
       min-height: 100vh;
       overflow: hidden;
+      display: flex; /* uses only space fixed size child elements need, in this case text */
     }
 
     .panel {
@@ -43,6 +44,11 @@
       font-size: 20px;
       background-size: cover;
       background-position: center;
+      flex: 1; /* redistributes unused space for flex boxes*/
+      justify-content: center; /*c enters the child elements in flex containers */
+      align-items: center;
+      display: flex; /*makes 'panel' (child elements of flex box 'panels') elements flex boxes as well as flex items*/
+      flex-direction: column;
     }
 
     .panel1 { background-image:url(https://source.unsplash.com/gYl-UtwNg_I/1500x1500); }
@@ -56,7 +62,17 @@
       margin: 0;
       width: 100%;
       transition: transform 0.5s;
+      border: 1px solid red;
+      flex: 1 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
+
+    .panel > *:first-child { transform: translateY(-100%); } /* pushes first contained element above window */
+    .panel.open-active > *:first-child { transform: translateY(0); } /* if first element has class 'open-active', revert Y-position */
+    .panel > *:last-child { transform: translateY(100%); } /* pushes last contained element below window */
+    .panel.open-active > *:last-child { transform: translateY(0); } /* if last element has class 'open-active', revert Y-position */
 
     .panel p {
       text-transform: uppercase;
@@ -70,6 +86,7 @@
     }
 
     .panel.open {
+      flex: 5; /* 1 takes 1x the extra space as other elements (even distribution) --> 5 takes 5x the extra space as others */
       font-size: 40px;
     }
 
@@ -105,6 +122,20 @@
   </div>
 
   <script>
+    const panels = document.querySelectorAll(".panel");
+
+    function toggleOpen() {
+      this.classList.toggle("open");
+    }
+
+    function toggleActive(e) {  /* normally do this.classList.toggle('open-active')... However, there will be multiple events firing*/
+      if(e.propertyName.includes("flex")) { /*using .includes() b/c browsers reference "flex-grow" and "flex" differently*/
+        this.classList.toggle("open-active");
+      }
+    }
+
+    panels.forEach(panel => panel.addEventListener("click", toggleOpen)); /* toggleOpen() activates on page load; since we're only referencing the func. we exclude "()" */
+    panels.forEach(panel => panel.addEventListener("transitionend", toggleActive)); /* vs click, 'transitionend' listens for end of event to activate*/
 
   </script>
 
